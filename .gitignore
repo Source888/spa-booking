@@ -1,0 +1,5 @@
+settings.php
+#all txt files
+*.txt
+#all json files
+*.json
