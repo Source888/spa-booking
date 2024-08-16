@@ -1,4 +1,5 @@
 <?php
+ini_set('display_errors', 1);
 require_once 'settings.php';
 /** Merchant API Token */
 function get_access_token() {
@@ -17,24 +18,24 @@ function get_access_token() {
         
     );
     //var_dump($headers);
-    $post_fields = "grant_type=client_credentials&client_id=".CLIENT_ID."&client_secret=".CLIENT_SECRET."&scope=merchant";
+    $post_fields = "grant_type=personal_access_token&client_id=".CLIENT_ID."&client_secret=".CLIENT_SECRET."&scope=merchant&personal_access_token=".urlencode(SLIDING_TOKEN);
     curl_setopt($curl, CURLOPT_POSTFIELDS, $post_fields);
     curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 
     $resp = curl_exec($curl);
     curl_close($curl);
-
+    var_dump($resp);
     if ($resp === false) {
-        error_log("Curl error: " . curl_error($curl));
+        echo("Curl error: " . curl_error($curl));
         return null;
     }
 
     $response = json_decode($resp, true);
     if (isset($response['error'])) {
-        error_log("API error: " . $response['error_description']);
+        echo("API error: " . $response['error_description']);
         return null;
     }
-    var_dump($response);
+    
     $access_token = $response['access_token'];
     $expires_in = $response['expires_in'];
     $expires_at = time() + $expires_in;
@@ -83,8 +84,9 @@ function get_customer_access_token(){
         'Ocp-Apim-Subscription-Key: '.SECONDARY_CUSTOMER_API_KEY,
         
     );
-    var_dump($headers);
-    $post_fields = "grant_type=client_credentials&client_id=".CLIENT_ID."&client_secret=".CLIENT_SECRET."&scope=customer";
+    //var_dump($headers);
+    $post_fields = "grant_type=personal_access_token&client_id=".CLIENT_ID."&client_secret=".CLIENT_SECRET."&scope=customer&personal_access_token=".urlencode(SLIDING_TOKEN);
+   
     curl_setopt($curl, CURLOPT_POSTFIELDS, $post_fields);
     curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 
@@ -139,7 +141,7 @@ function find_customer($email = null) {
         $email = 'Alexia@hotmail.com';
         
     }
-    $url = MERCHANT_API_URL . 'employees';
+    $url = MERCHANT_API_URL . 'customers/partial';
     $curl = curl_init($url);
     $post_fields = array(
         'FilterByExactLocationID' => true,
