@@ -3,3 +3,5 @@ settings.php
 *.txt
 #all json files
 *.json
+#folder named ".osp" and all its contents
+.osp/
